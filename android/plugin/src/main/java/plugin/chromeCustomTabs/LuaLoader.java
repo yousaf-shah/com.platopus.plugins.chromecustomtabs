@@ -187,8 +187,6 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 	@SuppressWarnings("unused")
 	public void dispatchEvent(final String message) {
 
-		Log.w("dispatchEvent", "" + message);
-
 		CoronaEnvironment.getCoronaActivity().getRuntimeTaskDispatcher().send( new CoronaRuntimeTask() {
 			@Override
 			public void executeUsing(CoronaRuntime runtime) {
@@ -432,7 +430,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 							default:
 								event = String.valueOf(navigationEvent);
 						}
-						Log.w("CustomTabs", "onNavigationEvent: Code = " + navigationEvent + ":" + event);
+						Log.w("CustomTabs", "onNavigationEvent: [" + navigationEvent + "] " + event);
 						dispatchEvent(event);
 					}
 				});
