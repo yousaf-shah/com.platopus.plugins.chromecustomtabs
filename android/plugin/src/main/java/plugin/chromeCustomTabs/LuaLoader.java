@@ -98,8 +98,8 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		// Register this plugin into Lua with the following functions.
 		NamedJavaFunction[] luaFunctions = new NamedJavaFunction[] {
 			new InitCustomTabWrapper(),
-			new SupportsCustomTabsWrapper(),
-			new ShowCustomTabWrapper(),
+			new supportsCustomTabs(),
+			new showCustomTab(),
 		};
 		String libName = L.toString( 1 );
 		L.register(libName, luaFunctions);
@@ -174,6 +174,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 
 		if( null != cCT ) {
 			cCT.unbindCustomTabsService();
+			Log.w("onExiting", "Unbind Custom Tabs Service" );
 		}
 
 	}
@@ -200,11 +201,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 
 				try {
 					CoronaLua.dispatchEvent( L, fListener, 0 );
-				} catch (Exception ignored) {
-
-					Log.w("dispatchEvent", "Exception" );
-
-				}
+				} catch (Exception ignored) {}
 			}
 		} );
 	}
@@ -245,51 +242,6 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		return 1;
 	}
 
-
-	/**
-	 * The following Lua function has been called:  chromeCustomTabs.supportsCustomTabs( listener )
-	 * <p>
-	 * Warning! This method is not called on the main thread.
-	 * @param L Reference to the Lua state that the Lua function was called from.
-	 * @return Returns the number of values to be returned by the chromeCustomTabs.supportsCustomTabs() function.
-	 */
-	@SuppressWarnings({"WeakerAccess", "SameReturnValue"})
-	public int supportsCustomTabs(LuaState L) {
-
-		String packageName = CustomTabsClient.getPackageName(
-				CoronaEnvironment.getCoronaActivity(),
-				Collections.emptyList()
-		);
-
-		// True is Custom Tabs are supported by the default browser
-		L.pushBoolean(packageName != null);
-		return 1;
-
-	}
-
-	/**
-	 * The following Lua function has been called:  chromeCustomTabs.show( word )
-	 * <p>
-	 * Warning! This method is not called on the main thread.
-	 * @param L Reference to the Lua state that the Lua function was called from.
-	 * @return Returns the number of values to be returned by the chromeCustomTabs.show() function.
-	 */
-	@SuppressWarnings("WeakerAccess")
-	public int showCustomTab(LuaState L) {
-
-		if (null == cCT) {
-			L.pushBoolean(false);
-			return 1;
-		}
-
-		dispatchEvent("Show");
-
-		cCT.show();
-
-		L.pushBoolean(true);
-		return 1;
-	}
-
 	/** Implements the chromeCustomTabs.initCustomTab() Lua function. */
 	private class InitCustomTabWrapper implements NamedJavaFunction {
 		/**
@@ -315,8 +267,8 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		}
 	}
 
-	/** Implements the chromeCustomTabs.show() Lua function. */
-	private class ShowCustomTabWrapper implements NamedJavaFunction {
+	/** Implements the chromeCustomTabs.showCustomTab() Lua function. */
+	private class showCustomTab implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
@@ -336,12 +288,21 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		 */
 		@Override
 		public int invoke(LuaState L) {
-			return showCustomTab(L);
+
+			if (null == cCT) {
+				L.pushBoolean(false);
+				return 1;
+			}
+
+			dispatchEvent("TAB_SHOW");
+			cCT.show();
+			L.pushBoolean(true);
+			return 1;
 		}
 	}
 
 	/** Implements the chromeCustomTabs.supportsCustomTabs() Lua function. */
-	private class SupportsCustomTabsWrapper implements NamedJavaFunction {
+	private class supportsCustomTabs implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
@@ -361,7 +322,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		 */
 		@Override
 		public int invoke(LuaState L) {
-			return supportsCustomTabs(L);
+
+			String packageName = CustomTabsClient.getPackageName(
+					CoronaEnvironment.getCoronaActivity(),
+					Collections.emptyList()
+			);
+
+			// True is Custom Tabs are supported by the default browser
+			L.pushBoolean(packageName != null);
+			return 1;
 		}
 	}
 	public class ChromeCustomTab {
