@@ -394,7 +394,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 			builder.setExitAnimations(activity, android.R.anim.fade_in, android.R.anim.fade_out);
 			builder.setUrlBarHidingEnabled(true);
 			builder.setShowTitle(true);
-			builder.setInitialActivityHeightPx(400);
+//			builder.setInitialActivityHeightPx(400);
 			builder.setToolbarCornerRadiusDp(10);
 
 			CustomTabsIntent customTabsIntent = builder.build();
