@@ -144,6 +144,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 	 */
 	@Override
 	public void onSuspended(CoronaRuntime runtime) {
+		Log.w("CustomTabs", "onSuspended: App Suspended");
 	}
 
 	/**
@@ -154,6 +155,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 	 */
 	@Override
 	public void onResumed(CoronaRuntime runtime) {
+		Log.w("CustomTabs", "onResume: App Resumed");
 	}
 
 	/**
@@ -174,7 +176,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 
 		if( null != cCT ) {
 			cCT.unbindCustomTabsService();
-			Log.w("onExiting", "Unbind Custom Tabs Service" );
+			Log.w("CustomTabs", "onExiting - Unbind Custom Tabs Service" );
 		}
 
 	}
@@ -442,6 +444,9 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 			if (client != null) {
 				return;
 			}
+
+			Log.w("CustomTabs", "Binding Custom Tabs Service ..." );
+
 			connection = new CustomTabsServiceConnection() {
 				@Override
 				public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
