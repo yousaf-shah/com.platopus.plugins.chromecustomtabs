@@ -41,7 +41,7 @@ tasks.register("extractPluginJar") {
 // This creates archive for plugin so it can be used by Simulator from build.settings
 // by deploying it directly to Solar2DPlugins directory. This is first in line location
 // to retrieve plugins, so will overshadow online directory/store downloads.
-def providerId = 'com.solar2d'
+def providerId = 'com.platopus'
 tasks.register("deployToLocalSolar2DRepo", Tar) {
     group "Solar2Dev"
 
