@@ -461,8 +461,8 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 					.setToolbarColor(colorPrimaryDark)
 					.build());
 
-			builder.setStartAnimations(activity, android.R.anim.fade_in, android.R.anim.fade_out);
-			builder.setExitAnimations(activity, android.R.anim.fade_in, android.R.anim.fade_out);
+//			builder.setStartAnimations(activity, android.R.anim.fade_in, android.R.anim.fade_out);
+//			builder.setExitAnimations(activity, android.R.anim.fade_in, android.R.anim.fade_out);
 			builder.setUrlBarHidingEnabled(true);
 			builder.setShowTitle(true);
 //			builder.setInitialActivityHeightPx(400);
