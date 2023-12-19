@@ -23,13 +23,15 @@ end
 
 if chromeCustomTabs.supportsCustomTabs() then
 
-	chromeCustomTabs.initCustomTab( "https://platopusretail.com/", listener )
+	chromeCustomTabs.initCustomTab( "https://solar2d.com/", listener )
+
+	chromeCustomTabs.warmupCustomTab()
 
 	print( "Init chromeCustomTabs plugin ...")
 
-	timer.performWithDelay( 1000, function()
+	timer.performWithDelay( 4000, function()
 
-		chromeCustomTabs.showCustomTab( "https://platopusretail.com/" )
+		chromeCustomTabs.showCustomTab()
 
 	end )
 

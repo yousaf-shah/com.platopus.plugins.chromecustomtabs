@@ -99,6 +99,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		NamedJavaFunction[] luaFunctions = new NamedJavaFunction[] {
 			new InitCustomTabWrapper(),
 			new supportsCustomTabs(),
+			new warmupCustomTab(),
 			new showCustomTab(),
 		};
 		String libName = L.toString( 1 );
@@ -296,6 +297,40 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 
 			dispatchEvent("TAB_SHOW");
 			cCT.show();
+			L.pushBoolean(true);
+			return 1;
+		}
+	}
+
+	/** Implements the chromeCustomTabs.warmupCustomTab() Lua function. */
+	private class warmupCustomTab implements NamedJavaFunction {
+		/**
+		 * Gets the name of the Lua function as it would appear in the Lua script.
+		 * @return Returns the name of the custom Lua function.
+		 */
+		@Override
+		public String getName() {
+			return "warmupCustomTab";
+		}
+
+		/**
+		 * This method is called when the Lua function is called.
+		 * <p>
+		 * Warning! This method is not called on the main UI thread.
+		 * @param L Reference to the Lua state.
+		 *                 Needed to retrieve the Lua function's parameters and to return values back to Lua.
+		 * @return Returns the number of values to be returned by the Lua function.
+		 */
+		@Override
+		public int invoke(LuaState L) {
+
+			if (null == cCT) {
+				L.pushBoolean(false);
+				return 1;
+			}
+
+			dispatchEvent("TAB_WARMUP");
+			cCT.warmup();
 			L.pushBoolean(true);
 			return 1;
 		}
