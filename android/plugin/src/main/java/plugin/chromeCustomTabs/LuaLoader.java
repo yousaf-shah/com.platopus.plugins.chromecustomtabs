@@ -101,6 +101,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 			new supportsCustomTabs(),
 			new warmupCustomTab(),
 			new showCustomTab(),
+			new unbindCustomTab(),
 		};
 		String libName = L.toString( 1 );
 		L.register(libName, luaFunctions);
@@ -365,6 +366,41 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 
 			// True is Custom Tabs are supported by the default browser
 			L.pushBoolean(packageName != null);
+			return 1;
+		}
+	}
+
+	/** Implements the chromeCustomTabs.unbindCustomTab() Lua function. */
+	private class unbindCustomTab implements NamedJavaFunction {
+		/**
+		 * Gets the name of the Lua function as it would appear in the Lua script.
+		 * @return Returns the name of the custom Lua function.
+		 */
+		@Override
+		public String getName() {
+			return "unbindCustomTab";
+		}
+
+		/**
+		 * This method is called when the Lua function is called.
+		 * <p>
+		 * Warning! This method is not called on the main UI thread.
+		 * @param L Reference to the Lua state.
+		 *                 Needed to retrieve the Lua function's parameters and to return values back to Lua.
+		 * @return Returns the number of values to be returned by the Lua function.
+		 */
+		@Override
+		public int invoke(LuaState L) {
+
+			if( null != cCT ) {
+				cCT.unbindCustomTabsService();
+				Log.w("CustomTabs", "Unbind Custom Tabs Service" );
+				L.pushBoolean(true);
+				return 1;
+			}
+
+			// did not need to unbind
+			L.pushBoolean(false);
 			return 1;
 		}
 	}
