@@ -39,6 +39,8 @@ If you are using a custom url scheme (for instance to finish off an oAuth sign-i
 
 If the user presses the device’s back icon/button during the custom tab session the tab will close and your app will not receive the back event - only the `TAB_HIDDEN` event in your listener.
 
+A fuller example is included in the code [here](https://github.com/yousaf-shah/com.platopus.plugins.chromecustomtabs/blob/main/Corona/main.lua).
+
 ## Functions
 
 bool **supportsCustomTabs()**\
