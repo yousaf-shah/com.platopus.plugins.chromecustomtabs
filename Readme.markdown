@@ -20,7 +20,7 @@ plugins = {
 	  {
 	  publisherId = "com.platopus",
 	  supportedPlatforms = {
-	    android = { url="https://github.com/yousaf-shah/com.platopus.plugins.chromecustomtabs/releases/download/1.0.2/data.tgz" },
+	    android = { url="https://github.com/yousaf-shah/com.platopus.plugins.chromecustomtabs/releases/download/1.0.3/data.tgz" },
 	  },
 	},
 }
