@@ -12,17 +12,6 @@ local log = display.newText{
     align = "center"
 }
 
--- This event is dispatched to the global Runtime object
--- by `didLoadMain:` in MyCoronaDelegate.mm
-local function delegateListener( event )
-	native.showAlert(
-		"Event dispatched from `didLoadMain:`",
-		"of type: " .. tostring( event.name ),
-		{ "OK" } )
-end
-
-Runtime:addEventListener( "delegate", delegateListener )
-
 -- This event is dispatched to the following Lua function
 -- by PluginLibrary::show() in PluginLibrary.mm
 
