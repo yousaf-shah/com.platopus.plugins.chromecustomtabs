@@ -28,12 +28,13 @@ plugins = {
 
 Basic usage is as follows:
 
-- Check if your device supports Chrome Custom Tabs using **supportsCustomTabs()** it will return **true** if they are supported
-- Initialise the plugin using **initCustomTab(url, listener)**
-- If you desire you can ‘warm up’ the tab using **warmupCustomTab()**.
-- Show the tab using **showCustomTab()** and listen for results in your listener function.
+- Check if your device supports Chrome Custom Tabs using **supported()** it will return **true** if they are supported
+- Initialise the plugin using **init(listener)**
+- If you desire you can ‘warm up’ the tab using **warmup()**.
+- If you desire you can ‘pre-load’ the content using **mayLaunch(url)**.
+- Show the tab using **show(url)** and listen for results in your listener function.
 
-When you issue **showCustomTab()**, your listener will receive a `TAB_SHOW` event and then your app will be suspended. The listener will receive all the events in one go when the tab is closed.
+When you issue **show()**, your listener will receive a `TAB_SHOW` event and then your app will be suspended. The listener will receive all the events in one go when the tab is closed.
 
 If you are using a custom url scheme (for instance to finish off an oAuth sign-in), tour app will resume with the `applicationOpen` event and you should look for the launch URL there, other than this, you will not know where the user has browsed to in the tab beyond the url you opened the tab with.
 
@@ -43,28 +44,31 @@ A fuller example is included in the code [here](https://github.com/yousaf-shah/c
 
 ## Functions
 
-bool **supportsCustomTabs()**\
+bool **supported()**\
 Returns true if the device supports Chrome Custom Tabs and false if it does not. If your device does not support them, the OS will open any urls you try to show in the built in browser.
 
-bool **initCustomTab(url, listener)**\
-Sets up the Chrome Custom Tab with the `url` specified. The `listener` function will receive events throughout the lifetime of the bound session. Returns **true** if the initialisation was successful.
+bool **init(listener)**\
+Sets up the Chrome Custom Tab. The `listener` function will receive events throughout the lifetime of the bound session. Returns **true** if the initialisation was successful.
 
-bool **warmupCustomTab()**\
-This is optional and of use if you have time to invoke it before the user actions the tab to be shown. It will get the OS preloading chrome in the background to make the pop-up appear faster when the tab is shown, Google quotes up to 700ms faster in some cases. Returns `false` if there was not a session initialised by `initCustomTab(url, listener)`.
+bool **warmup()**\
+Use of this is optional if you have time to invoke it before the user actions the tab to be shown. It will get the OS preloading chrome in the background to make the pop-up appear faster when the tab is shown, Google quotes up to 700ms faster in some cases. Returns `false` if there was not a session initialised by `init(listener)`.
 
-bool **showCustomTab()**\
-Shows the Chrome Custom Tab, suspending your app while the user interacts with the it. Returns `false` if there was not a session initialised by `initCustomTab(url, listener)`.
+bool **mayLaunch(url)**\
+Use of this is optional if you have time to invoke it before the user actions the tab to be shown. It will tell the Chrome engine that you will be visiting this URL allowing it to pre-load content if it chooses to. Returns `false` if there was not a session initialised by `initCustomTab(listener, url)` or if there is no url supplied.
 
-bool **unbindCustomTab()** (Experimental/In Progress)\
-Try to unbind the session you initialised, I’m not convinced this is necessary but it may help you to fix issues where multiple tabs are fired throughout your app. Returns `false` if there was not a session initialised by `initCustomTab(url, listener)`, but mostly in my testing it causes an exception if this is the case!
+bool **show(url)**\
+Shows the Chrome Custom Tab, suspending your app while the user interacts with the it. The `url` is optional if you supplied one during `init(listener)`. Returns `false` if there was not a session initialised by `initCustomTab( listener, url(optional) )` or if there is no url supplied .
+
+bool **unbind()** (Experimental/In Progress)\
+Try to unbind the session you initialised, I’m not convinced this is necessary but it may help you to fix issues where multiple tabs are fired throughout your app. Returns `false` if there was not a session initialised by `init(listener)`, but mostly in my testing it causes an exception if this is the case!
 
 
 ## Listener Events
 
-After you have initialised using `initCustomTab(url, listener)`, the `listener` function will receive the following events:
+After you have initialised using `init(listener)`, the `listener` function will receive the following events:
 
 TAB_SHOW\
-Immediately after **showCustomTab()** is issued and before your app suspends to show the tab.
+Immediately after **show(url)** is issued and before your app suspends to show the tab.
 
 TAB_SHOWN*\
 The tab was shown to the user.
@@ -73,7 +77,10 @@ TAB_HIDDEN\
 The tab was closed using the close icon or the device’s back function.
 
 TAB_WARMUP\
-The **warmupCustomTab()** function was called successfully.
+The **warmup()** function was called successfully.
+
+TAB_MAYLAUNCH\
+The **mayLaunch(url)** function was called successfully.
 
 NAVIGATION_ABORTED*\
 The user cancelled the page load before it finished loading.
