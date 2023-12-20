@@ -50,7 +50,7 @@ bool **initCustomTab(url, listener)**\
 Sets up the Chrome Custom Tab with the `url` specified. The `listener` function will receive events throughout the lifetime of the bound session. Returns **true** if the initialisation was successful.
 
 bool **warmupCustomTab()**\
-This is optional and of use if you have time to invoke it before the user actions the tab to be shown. It will get the OS preloading chrome in the background to make the pop-up appear faster when the tab is shown, Google quotes at least 700ms faster in most cases. Returns `false` if there was not a session initialised by `initCustomTab(url, listener)`.
+This is optional and of use if you have time to invoke it before the user actions the tab to be shown. It will get the OS preloading chrome in the background to make the pop-up appear faster when the tab is shown, Google quotes up to 700ms faster in some cases. Returns `false` if there was not a session initialised by `initCustomTab(url, listener)`.
 
 bool **showCustomTab()**\
 Shows the Chrome Custom Tab, suspending your app while the user interacts with the it. Returns `false` if there was not a session initialised by `initCustomTab(url, listener)`.
@@ -70,7 +70,7 @@ TAB_SHOWN\
 The tab was shown to the user.
 
 TAB_HIDDEN\
-The tab was closed using the back button or the device’s back function.
+The tab was closed using the close icon or the device’s back function.
 
 TAB_WARMUP\
 The **warmupCustomTab()** function was called successfully.
