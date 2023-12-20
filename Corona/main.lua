@@ -12,9 +12,6 @@ local log = display.newText{
     align = "center"
 }
 
--- This event is dispatched to the following Lua function
--- by PluginLibrary::show() in PluginLibrary.mm
-
 function myTouchListener( event )
 
     if event.phase == "ended" then
