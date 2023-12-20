@@ -1,4 +1,4 @@
-# customChromeTabs-Plugin
+# Solar2D chromeCustomTabs Plugin
 
 Solar2D plugin which presents a Web View using Chrome Custom Tabs (https://developer.chrome.com/docs/android/custom-tabs) for use with OAuth and other secure web browsing needs.
 
