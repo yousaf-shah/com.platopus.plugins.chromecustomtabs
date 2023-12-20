@@ -97,11 +97,12 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 	public int invoke(LuaState L) {
 		// Register this plugin into Lua with the following functions.
 		NamedJavaFunction[] luaFunctions = new NamedJavaFunction[] {
-			new InitCustomTabWrapper(),
-			new supportsCustomTabs(),
-			new warmupCustomTab(),
-			new showCustomTab(),
-			new unbindCustomTab(),
+			new initWrapper(),
+			new supported(),
+			new warmup(),
+			new mayLaunch(),
+			new show(),
+			new unbind(),
 		};
 		String libName = L.toString( 1 );
 		L.register(libName, luaFunctions);
@@ -209,17 +210,17 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 	}
 
 	/**
-	 * The following Lua function has been called:  chromeCustomTabs.initCustomTab( listener )
+	 * The following Lua function has been called:  chromeCustomTabs.init( listener, url )
 	 * <p>
 	 * Warning! This method is not called on the main thread.
 	 * @param L Reference to the Lua state that the Lua function was called from.
-	 * @return Returns the number of values to be returned by the chromeCustomTabs.initCustomTab() function.
+	 * @return Returns the number of values to be returned by the chromeCustomTabs.init() function.
 	 */
 	@SuppressWarnings({"WeakerAccess", "SameReturnValue"})
-	public int initCustomTab(LuaState L) {
+	public int init(LuaState L) {
 
-		int urlIndex = 1;
-		int listenerIndex = 2;
+		int urlIndex = 2;
+		int listenerIndex = 1;
 
 		CoronaActivity activity = CoronaEnvironment.getCoronaActivity();
 		if (activity == null) {
@@ -227,32 +228,34 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 			return 1;
 		}
 
-		// Fetch the first argument from the called Lua function.
-		String url = L.checkString( urlIndex );
-		if ( null == url ) {
+		if ( CoronaLua.isListener( L, listenerIndex, EVENT_NAME ) ) {
+			fListener = CoronaLua.newRef( L, listenerIndex );
+		} else {
 			L.pushBoolean(false);
 			return 1;
 		}
 
-		if ( CoronaLua.isListener( L, listenerIndex, EVENT_NAME ) ) {
-			fListener = CoronaLua.newRef( L, listenerIndex );
+		// Fetch the first argument from the called Lua function.
+		if (L.isString(urlIndex)) {
+			String url = L.checkString(urlIndex);
+			cCT = new ChromeCustomTab(activity, url);
+		} else {
+			cCT = new ChromeCustomTab(activity);
 		}
-
-		cCT = new ChromeCustomTab(activity,url);
 
 		L.pushBoolean(true);
 		return 1;
 	}
 
-	/** Implements the chromeCustomTabs.initCustomTab() Lua function. */
-	private class InitCustomTabWrapper implements NamedJavaFunction {
+	/** Implements the chromeCustomTabs.init() Lua function. */
+	private class initWrapper implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
 		 */
 		@Override
 		public String getName() {
-			return "initCustomTab";
+			return "init";
 		}
 		
 		/**
@@ -265,19 +268,19 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		 */
 		@Override
 		public int invoke(LuaState L) {
-			return initCustomTab(L);
+			return init(L);
 		}
 	}
 
-	/** Implements the chromeCustomTabs.showCustomTab() Lua function. */
-	private class showCustomTab implements NamedJavaFunction {
+	/** Implements the chromeCustomTabs.show() Lua function. */
+	private class show implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
 		 */
 		@Override
 		public String getName() {
-			return "showCustomTab";
+			return "show";
 		}
 
 		/**
@@ -296,6 +299,14 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 				return 1;
 			}
 
+			if (L.isString( 1 ) ) {
+				String url = L.checkString(1);
+				cCT.url = url;
+			} else if( cCT.url == null || cCT.url == "" ) {
+				L.pushBoolean(false);
+				return 1;
+			}
+
 			dispatchEvent("TAB_SHOW");
 			cCT.show();
 			L.pushBoolean(true);
@@ -303,15 +314,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		}
 	}
 
-	/** Implements the chromeCustomTabs.warmupCustomTab() Lua function. */
-	private class warmupCustomTab implements NamedJavaFunction {
+	/** Implements the chromeCustomTabs.warmup() Lua function. */
+	private class warmup implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
 		 */
 		@Override
 		public String getName() {
-			return "warmupCustomTab";
+			return "warmup";
 		}
 
 		/**
@@ -337,15 +348,57 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		}
 	}
 
-	/** Implements the chromeCustomTabs.supportsCustomTabs() Lua function. */
-	private class supportsCustomTabs implements NamedJavaFunction {
+	/** Implements the chromeCustomTabs.mayLaunch() Lua function. */
+	private class mayLaunch implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
 		 */
 		@Override
 		public String getName() {
-			return "supportsCustomTabs";
+			return "mayLaunch";
+		}
+
+		/**
+		 * This method is called when the Lua function is called.
+		 * <p>
+		 * Warning! This method is not called on the main UI thread.
+		 * @param L Reference to the Lua state.
+		 *                 Needed to retrieve the Lua function's parameters and to return values back to Lua.
+		 * @return Returns the number of values to be returned by the Lua function.
+		 */
+		@Override
+		public int invoke(LuaState L) {
+
+			if (null == cCT) {
+				L.pushBoolean(false);
+				return 1;
+			}
+
+			if (L.isString( 1 ) ) {
+				String url = L.checkString(1);
+				cCT.url = url;
+			} else if( cCT.url == null || cCT.url == "" ) {
+				L.pushBoolean(false);
+				return 1;
+			}
+
+			dispatchEvent("TAB_MAYLAUNCH");
+			cCT.mayLaunch();
+			L.pushBoolean(true);
+			return 1;
+		}
+	}
+
+	/** Implements the chromeCustomTabs.supported() Lua function. */
+	private class supported implements NamedJavaFunction {
+		/**
+		 * Gets the name of the Lua function as it would appear in the Lua script.
+		 * @return Returns the name of the custom Lua function.
+		 */
+		@Override
+		public String getName() {
+			return "supported";
 		}
 
 		/**
@@ -370,15 +423,15 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		}
 	}
 
-	/** Implements the chromeCustomTabs.unbindCustomTab() Lua function. */
-	private class unbindCustomTab implements NamedJavaFunction {
+	/** Implements the chromeCustomTabs.unbind() Lua function. */
+	private class unbind implements NamedJavaFunction {
 		/**
 		 * Gets the name of the Lua function as it would appear in the Lua script.
 		 * @return Returns the name of the custom Lua function.
 		 */
 		@Override
 		public String getName() {
-			return "unbindCustomTab";
+			return "unbind";
 		}
 
 		/**
@@ -409,7 +462,7 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		public static final String CUSTOM_TAB_PACKAGE_NAME = "com.android.chrome";
 
 		private Activity activity;
-		private String url;
+		public String url = "";
 
 		private CustomTabsSession customTabsSession;
 		private CustomTabsClient client;
@@ -421,6 +474,11 @@ public class LuaLoader implements JavaFunction, CoronaRuntimeListener {
 		public ChromeCustomTab(Activity activity, String url) {
 			this.activity = activity;
 			this.url = url;
+			bindCustomTabsService();
+		}
+
+		public ChromeCustomTab(Activity activity) {
+			this.activity = activity;
 			bindCustomTabsService();
 		}
 

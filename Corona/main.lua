@@ -12,33 +12,37 @@ local log = display.newText{
     align = "center"
 }
 
+local function listener( event )
+
+	log.text = log.text .. "\nAction received: " .. event.message
+	print( "Received event from chromeCustomTabs plugin (" .. event.name .. "): ", event.message )
+
+end
+
+if chromeCustomTabs.supported() then
+	
+	chromeCustomTabs.init(listener)
+
+end
+
 function myTouchListener( event )
 
     if event.phase == "ended" then
 
-	    if chromeCustomTabs.supportsCustomTabs() then
+	    if chromeCustomTabs.supported() then
 
-			local function listener( event )
-
-				log.text = log.text .. "\nAction received: " .. event.message
-				print( "Received event from chromeCustomTabs plugin (" .. event.name .. "): ", event.message )
-
-			end
-
-			chromeCustomTabs.initCustomTab( "https://solar2d.com/", listener )
-
-			chromeCustomTabs.warmupCustomTab()
+			chromeCustomTabs.warmup()
+			chromeCustomTabs.mayLaunch("https://solar2d.com/")
 
 			print( "Init chromeCustomTabs plugin ...")
 
 			timer.performWithDelay( 4000, function()
 
-				chromeCustomTabs.showCustomTab()
+				chromeCustomTabs.show("https://solar2d.com/")
 
 			end )
 
 		else
-
 
 			log.text = log.text .. "\nChrome Custom Tabs are not supported"
 			print( "Custom Tabs not supported on this Device")

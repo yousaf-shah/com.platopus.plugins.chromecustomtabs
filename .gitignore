@@ -2,7 +2,7 @@ android/.gradle/
 android/.idea/
 android/app/build/
 
-\# Compiled Lua sources
+# Compiled Lua sources
 luac.out
 
 # luarocks build files
