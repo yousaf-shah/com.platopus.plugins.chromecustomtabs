@@ -44,28 +44,28 @@ A fuller example is included in the code [here](https://github.com/yousaf-shah/c
 
 ## Functions
 
-bool **supported()**\
+bool **plugin.supported()**\
 Returns true if the device supports Chrome Custom Tabs and false if it does not. If your device does not support them, the OS will open any urls you try to show in the built in browser.
 
-bool **init(listener)**\
+bool **plugin.init(listener)**\
 Sets up the Chrome Custom Tab. The `listener` function will receive events throughout the lifetime of the bound session. Returns **true** if the initialisation was successful.
 
-bool **warmup()**\
-Use of this is optional if you have time to invoke it before the user actions the tab to be shown. It will get the OS preloading chrome in the background to make the pop-up appear faster when the tab is shown, Google quotes up to 700ms faster in some cases. Returns `false` if there was not a session initialised by `init(listener)`.
+bool **plugin.warmup()**\
+Use of this is optional if you have time to invoke it before the user actions the tab to be shown. It will get the OS preloading chrome in the background to make the pop-up appear faster when the tab is shown, Google quotes up to 700ms faster in some cases. Returns `false` if there was not a session initialised by `plugin.init(listener)`.
 
-bool **mayLaunch(url)**\
-Use of this is optional if you have time to invoke it before the user actions the tab to be shown. It will tell the Chrome engine that you will be visiting this URL allowing it to pre-load content if it chooses to. Returns `false` if there was not a session initialised by `initCustomTab(listener, url)` or if there is no url supplied.
+bool **plugin.mayLaunch(url)**\
+Use of this is optional if you have time to invoke it before the user actions the tab to be shown. It will tell the Chrome engine that you will be visiting this URL allowing it to pre-load content if it chooses to. Returns `false` if there was not a session initialised by `plugin.init(listener)` or if there is no url supplied.
 
-bool **show(url)**\
-Shows the Chrome Custom Tab, suspending your app while the user interacts with the it. The `url` is optional if you supplied one during `init(listener)`. Returns `false` if there was not a session initialised by `initCustomTab( listener, url(optional) )` or if there is no url supplied .
+bool **plugin.show(url)**\
+Shows the Chrome Custom Tab, suspending your app while the user interacts with the it. The `url` is optional if you supplied one during `plugin.init(listener)`. Returns `false` if there was not a session initialised by `plugin.init( listener)` or if there is no url supplied .
 
-bool **unbind()** (Experimental/In Progress)\
+bool **plugin.unbind()** (Experimental/In Progress)\
 Try to unbind the session you initialised, I’m not convinced this is necessary but it may help you to fix issues where multiple tabs are fired throughout your app. Returns `false` if there was not a session initialised by `init(listener)`, but mostly in my testing it causes an exception if this is the case!
 
 
 ## Listener Events
 
-After you have initialised using `init(listener)`, the `listener` function will receive the following events:
+After you have initialised using `plugin.init(listener)`, the `listener` function will receive the following events:
 
 TAB_SHOW\
 Immediately after **show(url)** is issued and before your app suspends to show the tab.
