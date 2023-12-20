@@ -66,7 +66,7 @@ After you have initialised using `initCustomTab(url, listener)`, the `listener` 
 TAB_SHOW\
 Immediately after **showCustomTab()** is issued and before your app suspends to show the tab.
 
-TAB_SHOWN\
+TAB_SHOWN*\
 The tab was shown to the user.
 
 TAB_HIDDEN\
@@ -75,15 +75,16 @@ The tab was closed using the close icon or the device’s back function.
 TAB_WARMUP\
 The **warmupCustomTab()** function was called successfully.
 
-NAVIGATION_ABORTED\
+NAVIGATION_ABORTED*\
 The user cancelled the page load before it finished loading.
 
-NAVIGATION_FAILED\
+NAVIGATION_FAILED*\
 The url requested failed to load.
 
-NAVIGATION_FINISHED\
+NAVIGATION_FINISHED*\
 The url requested loaded successfully. If you receive this, you can be fairly sure the user saw the page you requested.
 
-NAVIGATION_STARTED\
+NAVIGATION_STARTED*\
 The url requested started to load.
 	
+\* Generally you will receive all of these events together when the Chrome Tab session is closed and your app resumes.
